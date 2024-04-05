@@ -1,0 +1,272 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site1.master.cs" Inherits="TechPractice.Site1" %>
+
+<!DOCTYPE html>
+ <html>
+        <script type="text/javascript">
+            function OpenPopup() {
+
+                window.open("CreateEventView.aspx", "List", "toolbar=no, location=no,status=yes,menubar=no,scrollbars=yes,resizable=no, width=900,height=500,left=430,top=100");
+                return false;
+            }
+        </script>
+     <style type="text/css">  
+        .Background {
+    background-color: black;
+    filter: alpha(opacity=80);
+    opacity: 0.7;
+}
+
+.Popup {
+    background-color: #ededed ;
+    border-style: solid;
+    border-color: slategray;
+    border-radius: 10px;
+    padding-top: 10px;
+    padding-left: 10px;
+    width: 400px;
+    height: 350px;
+} 
+        </style>
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/map.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/geodata/worldTimeZonesLow.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/geodata/worldTimeZoneAreasLow.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Moonrise.js"></script>
+     <script src="https://cdn.amcharts.com/lib/5/map.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/geodata/worldLow.js"></script>
+    <script>
+        am5.ready(function () {
+            var root = am5.Root.new("chartdiv");
+            root.setThemes([
+                am5themes_Moonrise.new(root)
+            ]);
+            var chart = root.container.children.push(
+                am5map.MapChart.new(root, {
+                    panX: "none",
+                    panY: "none",
+                    wheelX: "none",
+                    wheelY: "none",
+                    projection: am5map.geoEquirectangular(),
+                }));
+
+            var colorSet = am5.ColorSet.new(root, {});
+            var areaSeries = chart.series.push(
+                am5map.MapPolygonSeries.new(root, {
+                    geoJSON: am5geodata_worldLow,
+                    exclude: ["AQ"],
+                })
+            );
+
+            var areaPolygonTemplate = areaSeries.mapPolygons.template;
+            areaPolygonTemplate.setAll({ fillOpacity: 0.6 });
+
+            areaPolygonTemplate.adapters.add("fill", function (fill, target) {
+                return am5.Color.saturate(
+                    colorSet.getIndex(areaSeries.mapPolygons.indexOf(target)),
+                    0.03
+                );
+            });
+
+            areaPolygonTemplate.states.create("hover", { fillOpacity: 0.8 });
+
+            var zoneSeries = chart.series.push(
+                am5map.MapPolygonSeries.new(root, {
+                    geoJSON: am5geodata_worldTimeZonesLow,
+
+                })
+            );
+
+            zoneSeries.mapPolygons.template.setAll({
+                fill: am5.color(0x000000),
+                fillOpacity: 0.08,
+            });
+
+            var zonePolygonTemplate = zoneSeries.mapPolygons.template;
+
+            zonePolygonTemplate.setAll({ interactive: true, tooltipText: "{id}" });
+            zonePolygonTemplate.states.create("hover", { fillOpacity: 0.5 });
+            zonePolygonTemplate.events.on("click", function (ev) {
+                console.log(ev.target.dataItem.dataContext.id);
+            });
+            chart.appear(1000, 100);
+
+        });
+    </script>
+        <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./index.css" />
+    <style data-tag="reset-style-sheet">
+        html {
+            line-height: 1.15;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        * {
+            box-sizing: border-box;
+            border-width: 0;
+            border-style: solid;
+        }
+
+        p, li, ul, pre, div, h1, h2, h3, h4, h5, h6, figure, blockquote, figcaption {
+            margin: 0;
+            padding: 0;
+        }
+
+        button {
+            background-color: transparent;
+        }
+
+        button, input, optgroup, select, textarea {
+            font-family: inherit;
+            font-size: 100%;
+            line-height: 1.15;
+            margin: 0;
+        }
+
+        button, select {
+            text-transform: none;
+        }
+
+        button, [type="button"], [type="reset"], [type="submit"] {
+            -webkit-appearance: button;
+        }
+
+            button::-moz-focus-inner, [type="button"]::-moz-focus-inner, [type="reset"]::-moz-focus-inner, [type="submit"]::-moz-focus-inner {
+                border-style: none;
+                padding: 0;
+            }
+
+            button:-moz-focus, [type="button"]:-moz-focus, [type="reset"]:-moz-focus, [type="submit"]:-moz-focus {
+                outline: 1px dotted ButtonText;
+            }
+
+        a {
+            color: inherit;
+            text-decoration: inherit;
+        }
+
+        input {
+            padding: 2px 4px;
+        }
+
+        img {
+            display: block;
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+    </style>
+    <style data-tag="default-style-sheet">
+        html {
+            font-family: Inter;
+            font-size: 16px;
+        }
+
+        body {
+            font-weight: 400;
+            font-style: normal;
+            text-decoration: none;
+            text-transform: none;
+            letter-spacing: normal;
+            line-height: 1.15;
+            color: var(--dl-color-gray-black);
+            background-color: var(--dl-color-gray-white);
+            [data-thq="thq-dropdown"]:hover > [data-thq="thq-dropdown-list"]
+
+        {
+            display: flex;
+        }
+
+        [data-thq="thq-dropdown"]:hover > div [data-thq="thq-dropdown-arrow"] {
+            transform: rotate(90deg);
+        }
+        }
+    </style>
+<body>
+                        <form id="form1" runat="server">
+
+            <header data-role="Header" class="home-header">
+                <img src="public/screenshot%202024-03-08%20223759-200h.png"
+                     alt="image"
+                     class="home-image" />
+                <div class="home-nav">
+                    <nav class="navigation-links-nav navigation-links-root-class-name10">
+                        <div class="navigation-links">Statistics </div>
+                        <div class="navigation-links">Link Archive</div>
+                        <div data-thq="thq-dropdown"
+                             class="navigation-links-thq-dropdown list-item">
+                            <div data-thq="thq-dropdown-toggle"
+                                 class="navigation-links-dropdown-toggle">
+                                <span class="navigation-links">Events<br /></span>
+                                <div data-thq="thq-dropdown-arrow"
+                                     class="navigation-links-dropdown-arrow">
+                                    <svg viewBox="0 0 1024 1024" class="navigation-links-icon">
+                                        <path d="M426 726v-428l214 214z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <ul data-thq="thq-dropdown-list"
+                                class="navigation-links-dropdown-list">
+                                <li data-thq="thq-dropdown"
+                                    class="navigation-links-dropdown list-item">
+                                    <div data-thq="thq-dropdown-toggle"
+                                         class="navigation-links-dropdown-toggle1">
+                                        <span class="navigation-links-p-day">Sub-menu Item</span>
+                                    </div>
+                                </li>
+                                <li data-thq="thq-dropdown"
+                                    class="navigation-links-dropdown1 list-item">
+                                    <div data-thq="thq-dropdown-toggle"
+                                         class="navigation-links-dropdown-toggle2">
+                                        <span class="navigation-links-m-day">Sub-menu Item</span>
+                                    </div>
+                                </li>
+                                <li data-thq="thq-dropdown"
+                                    class="navigation-links-dropdown2 list-item">
+                                    <div data-thq="thq-dropdown-toggle"
+                                         class="navigation-links-dropdown-toggle3">
+                                        <span class="navigation-links-text5">Sub-menu Item</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+                <div class="home-btn-group">
+                    <button class="home-login button">Login</button>
+                    <button class="button">Register</button>
+                        <asp:ScriptManager ID="ScriptManager1"
+            runat="server">
+        </asp:ScriptManager>
+<asp:Timer ID="Timer1" runat="server" Interval="100" ontick="Timer1_Tick">
+                </asp:Timer>
+        <asp:UpdatePanel ID="UpdatePanel1"
+            runat="server">
+            <ContentTemplate>
+                   <asp:Label ID="Label1" runat="server" Font-Bold="True"></asp:Label>
+            </ContentTemplate>
+            <Triggers>
+                <asp:AsyncPostBackTrigger ControlID="Timer1" EventName="Tick"></asp:AsyncPostBackTrigger>
+            </Triggers>
+        </asp:UpdatePanel>
+                </div>
+            </header>
+
+<asp:ContentPlaceHolder id="CPH1" runat="server">
+</asp:ContentPlaceHolder>
+
+            </form>
+
+                <footer class="home-footer">
+                <img alt="logo"
+                     src="https://presentation-website-assets.teleporthq.io/logos/logo.png"
+                     class="home-image3" />
+                <span class="home-text5">
+                    © 2021 teleportHQ, All Rights Reserved.
+                </span>
+            </footer>
+</body>
+</html>

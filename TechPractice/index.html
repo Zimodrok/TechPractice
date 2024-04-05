@@ -1,0 +1,325 @@
+<!--<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Foolish Everlasting Frog</title>
+    <meta property="og:title" content="Foolish Everlasting Frog" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+
+    <style data-tag="reset-style-sheet">
+        html {
+            line-height: 1.15;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        * {
+            box-sizing: border-box;
+            border-width: 0;
+            border-style: solid;
+        }
+
+        p, li, ul, pre, div, h1, h2, h3, h4, h5, h6, figure, blockquote, figcaption {
+            margin: 0;
+            padding: 0;
+        }
+
+        button {
+            background-color: transparent;
+        }
+
+        button, input, optgroup, select, textarea {
+            font-family: inherit;
+            font-size: 100%;
+            line-height: 1.15;
+            margin: 0;
+        }
+
+        button, select {
+            text-transform: none;
+        }
+
+        button, [type="button"], [type="reset"], [type="submit"] {
+            -webkit-appearance: button;
+        }
+
+            button::-moz-focus-inner, [type="button"]::-moz-focus-inner, [type="reset"]::-moz-focus-inner, [type="submit"]::-moz-focus-inner {
+                border-style: none;
+                padding: 0;
+            }
+
+            button:-moz-focus, [type="button"]:-moz-focus, [type="reset"]:-moz-focus, [type="submit"]:-moz-focus {
+                outline: 1px dotted ButtonText;
+            }
+
+        a {
+            color: inherit;
+            text-decoration: inherit;
+        }
+
+        input {
+            padding: 2px 4px;
+        }
+
+        img {
+            display: block;
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+    </style>
+    <style data-tag="default-style-sheet">
+        html {
+            font-family: Inter;
+            font-size: 16px;
+        }
+
+        body {
+            font-weight: 400;
+            font-style: normal;
+            text-decoration: none;
+            text-transform: none;
+            letter-spacing: normal;
+            line-height: 1.15;
+            color: var(--dl-color-gray-black);
+            background-color: var(--dl-color-gray-white);
+            [data-thq="thq-dropdown"]:hover > [data-thq="thq-dropdown-list"]
+
+        {
+            display: flex;
+        }
+
+        [data-thq="thq-dropdown"]:hover > div [data-thq="thq-dropdown-arrow"] {
+            transform: rotate(90deg);
+        }
+        }
+    </style>
+    <script >
+        $(document).ready(function () {
+            PopUpHide();
+        });
+        function PopUpShow() {
+            $("#popup1").show();
+        }
+        function PopUpHide() {
+            $("#popup1").hide();
+        }
+    </script>
+
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/map.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/geodata/worldTimeZonesLow.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/geodata/worldTimeZoneAreasLow.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Moonrise.js"></script>
+    <script>
+        am5.ready(function () {
+            var root = am5.Root.new("chartdiv");
+            root.setThemes([
+                am5themes_Moonrise.new(root)
+            ]);
+            var chart = root.container.children.push(
+                am5map.MapChart.new(root, {
+                    panX: "none",
+                    panY: "none",
+                    wheelX: "none",
+                    wheelY: "none",
+                    projection: am5map.geoEquirectangular(),
+                }));
+
+            var colorSet = am5.ColorSet.new(root, {});
+            var areaSeries = chart.series.push(
+                am5map.MapPolygonSeries.new(root, {
+                    geoJSON: am5geodata_worldTimeZoneAreasLow,
+                })
+            );
+
+            var areaPolygonTemplate = areaSeries.mapPolygons.template;
+            areaPolygonTemplate.setAll({ fillOpacity: 0.6 });
+
+            areaPolygonTemplate.adapters.add("fill", function (fill, target) {
+                return am5.Color.saturate(
+                    colorSet.getIndex(areaSeries.mapPolygons.indexOf(target)),
+                    0.03
+                );
+            });
+
+            areaPolygonTemplate.states.create("hover", { fillOpacity: 0.8 });
+
+            var zoneSeries = chart.series.push(
+                am5map.MapPolygonSeries.new(root, {
+                    geoJSON: am5geodata_worldTimeZonesLow,
+
+                })
+            );
+
+            zoneSeries.mapPolygons.template.setAll({
+                fill: am5.color(0x000000),
+                fillOpacity: 0.08,
+            });
+
+            var zonePolygonTemplate = zoneSeries.mapPolygons.template;
+
+            zonePolygonTemplate.setAll({ interactive: true, tooltipText: "{id}" });
+            zonePolygonTemplate.states.create("hover", { fillOpacity: 0.5 });
+            zonePolygonTemplate.events.on("click", function (ev) {
+                console.log(ev.target.dataItem.dataContext.id);
+            });
+            chart.appear(1000, 100);
+
+        });
+    </script>
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./index.css" />
+
+</head>
+<body>
+    <div>
+        <div class="home-container">
+            <header data-role="Header" class="home-header">
+                <img src="public/screenshot%202024-03-08%20223759-200h.png"
+                     alt="image"
+                     class="home-image" />
+                <div class="home-nav">
+                    <nav class="navigation-links-nav navigation-links-root-class-name10">
+                        <div class="navigation-links">Statistics </div>
+                        <div class="navigation-links">Link Archive</div>
+                        <div data-thq="thq-dropdown"
+                             class="navigation-links-thq-dropdown list-item">
+                            <div data-thq="thq-dropdown-toggle"
+                                 class="navigation-links-dropdown-toggle">
+                                <span class="navigation-links">Events<br /></span>
+                                <div data-thq="thq-dropdown-arrow"
+                                     class="navigation-links-dropdown-arrow">
+                                    <svg viewBox="0 0 1024 1024" class="navigation-links-icon">
+                                        <path d="M426 726v-428l214 214z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <ul data-thq="thq-dropdown-list"
+                                class="navigation-links-dropdown-list">
+                                <li data-thq="thq-dropdown"
+                                    class="navigation-links-dropdown list-item">
+                                    <div data-thq="thq-dropdown-toggle"
+                                         class="navigation-links-dropdown-toggle1">
+                                        <span class="navigation-links-p-day">Sub-menu Item</span>
+                                    </div>
+                                </li>
+                                <li data-thq="thq-dropdown"
+                                    class="navigation-links-dropdown1 list-item">
+                                    <div data-thq="thq-dropdown-toggle"
+                                         class="navigation-links-dropdown-toggle2">
+                                        <span class="navigation-links-m-day">Sub-menu Item</span>
+                                    </div>
+                                </li>
+                                <li data-thq="thq-dropdown"
+                                    class="navigation-links-dropdown2 list-item">
+                                    <div data-thq="thq-dropdown-toggle"
+                                         class="navigation-links-dropdown-toggle3">
+                                        <span class="navigation-links-text5">Sub-menu Item</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+                <div class="home-btn-group">
+                    <button class="home-login button">Login</button>
+                    <button class="button">Register</button>
+                </div>
+                <div data-role="MobileMenu" class="home-mobile-menu">
+                    <div class="home-nav1">
+                        <div class="home-container1">
+                            <img alt="image"
+                                 src="https://presentation-website-assets.teleporthq.io/logos/logo.png"
+                                 class="home-image1" />
+                        </div>
+                        <nav class="navigation-links-nav navigation-links-root-class-name11">
+                            <span class="navigation-links">Statistics</span>
+                            <span class="navigation-links">Link Archive</span>
+                            <div data-thq="thq-dropdown"
+                                 class="navigation-links-thq-dropdown list-item">
+                                <div data-thq="thq-dropdown-toggle"
+                                     class="navigation-links-dropdown-toggle">
+                                    <span class="navigation-links-text2">
+                                        <span>Events</span>
+                                        <br />
+                                    </span>
+                                </div>
+                                <ul data-thq="thq-dropdown-list"
+                                    class="navigation-links-dropdown-list">
+                                    <li data-thq="thq-dropdown"
+                                        class="navigation-links-dropdown list-item">
+                                        <span class="navigation-links-p-day">
+                                            Sub-menu Item
+                                        </span>
+                                    </li>
+                                    <li data-thq="thq-dropdown"
+                                        class="navigation-links-dropdown1 list-item">
+                                        <span class="navigation-links-m-day">
+                                            Sub-menu Item
+                                        </span>
+                                    </li>
+                                    <li data-thq="thq-dropdown"
+                                        class="navigation-links-dropdown2 list-item">
+
+                                        <span class="navigation-links-text5">
+                                            Sub-menu Item
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </nav>
+                    </div>
+                    <div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="home-container2">
+                <div id="chartdiv"></div>
+                <div class="container-container1">
+                    <ul class="container-ul list">
+                        <li id="L" class="container-li list-item">
+                            <span class="container-text">
+                                <span>Birthday</span>
+                                <br />
+                            </span>
+                        </li>
+                        <li id="L" class="container-li list-item">
+                            <span class="container-text3">
+                                <span>Cristmas</span>
+                                <br />
+                            </span>
+                        </li>
+                        <li id="L" class="container-li list-item">
+                            <span class="container-text6">
+                                <span>Mother&apos;s day</span>
+                                <br />
+                            </span>
+                        </li>
+                    </ul>
+                    <a id="openPopupButton" class="container-button button" href="#popup1">Button</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="popup1" class="overlay">
+        <div class="popup">
+            <h2>Here I am</h2>
+            <a class="close" href="#" onclick="closePopup()">&times;</a>
+            <div class="content">
+                Thank you for popping me out of that button, but now I'm done, so you can close this window.
+            </div>
+        </div>
+    </div>
+
+    <script defer=""
+            src="https://unpkg.com/@teleporthq/teleport-custom-scripts"></script>
+</body>
+</html>
+-->
