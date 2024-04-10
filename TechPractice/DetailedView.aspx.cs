@@ -202,10 +202,12 @@ namespace TechPractice {
             for (int i = 0; i < allLines.Length; i++) {
                 if (allLines[i].StartsWith(eventId)) {
                     string[] eventData = allLines[i].Split(';');
-                    if (eventData.Length >= 9) {
-                        eventData[8] = updatedLine;
-                        allLines[i] = string.Join(";", eventData);
-                    }
+                    try {
+                        if (eventData.Length >= 7) {
+                            eventData[8] = updatedLine;
+                            allLines[i] = string.Join(";", eventData);
+                        }
+                    } catch { }
                     break;
                 }
             }
