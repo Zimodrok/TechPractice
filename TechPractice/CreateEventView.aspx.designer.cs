@@ -49,6 +49,15 @@ namespace TechPractice {
         protected global::System.Web.UI.WebControls.TextBox txtName;
 
         /// <summary>
+        /// TextBoxDateTime control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox TextBoxDateTime;
+
+        /// <summary>
         /// txtTTL control.
         /// </summary>
         /// <remarks>
@@ -67,15 +76,6 @@ namespace TechPractice {
         protected global::System.Web.UI.WebControls.DropDownList ddlLocation;
 
         /// <summary>
-        /// btnSubmit control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnSubmit;
-
-        /// <summary>
         /// pnlSelectedLocations control.
         /// </summary>
         /// <remarks>
@@ -83,5 +83,14 @@ namespace TechPractice {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel pnlSelectedLocations;
+
+        /// <summary>
+        /// btnSubmit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnSubmit;
     }
 }

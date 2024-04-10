@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Web.UI.HtmlControls;
@@ -20,18 +21,27 @@ namespace TechPractice {
             public string OwnerID { get; set; }
         }
         protected void Page_Init(object sender, EventArgs e) {
-            // Read data from the CSV file
+            LoadEventData();
+        }
+
+        protected void btnClose_Click(object sender, EventArgs e) {
+            System.Threading.Thread.Sleep(1000);
+            LoadEventData();
+        }
+
+        private void LoadEventData() {
             List<EventData> eventDataList = ReadEventDataFromCSV("EventData.csv");
             List<string> buttonIds = ViewState["ButtonIds"] as List<string> ?? new List<string>();
             foreach (EventData eventData in eventDataList) {
                 string buttonId = "btn" + eventData.Id.ToString("N");
                 if (buttonIds.Contains(buttonId)) {
-                    Console.WriteLine("CSV IS CORRUPTED, UUID IS UNUNIQUE");
-                    continue; // Skip adding the button if the ID already exists
+                    Debug.WriteLine("CSV IS CORRUPTED, UUID IS UNUNIQUE");
+                    continue;
                 }
                 buttonIds.Add(buttonId);
                 Button button = new Button();
-                button.ID = buttonId; button.CssClass = "container-text";
+                button.ID = buttonId;
+                button.CssClass = "container-text button-wrap";
                 button.Text = eventData.Name;
                 button.Click += new EventHandler(btn_Click);
 
@@ -39,26 +49,20 @@ namespace TechPractice {
                 listItem.Controls.Add(button);
 
                 container.Controls.Add(listItem);
-
-                // Store the eventData object in a dictionary with the button ID as the key
                 eventDataDict.Add(button.ID, eventData);
             }
             ViewState["ButtonIds"] = buttonIds;
         }
 
-        // Method to read event data from the CSV file
         private List<EventData> ReadEventDataFromCSV(string fileName) {
             string filePath = Server.MapPath($"~/{fileName}");
 
             List<EventData> eventDataList = new List<EventData>();
-
-            // Read data from the CSV file
             using (StreamReader reader = new StreamReader(filePath)) {
-                // Read and process each line
                 string line;
                 while ((line = reader.ReadLine()) != null) {
                     string[] parts = line.Split(';');
-                    if (parts.Length >= 6) // Ensure the line has at least 6 parts
+                    if (parts.Length >= 6)
                     {
                         EventData eventData = new EventData();
                         eventData.Id = Guid.Parse(parts[0]);
@@ -71,12 +75,7 @@ namespace TechPractice {
                     }
                 }
             }
-
             return eventDataList;
-        }
-
-        protected void btnCreateEvent_Click(object sender, EventArgs e) {
-           // Response.Redirect($"CreateEventView.aspx");
         }
         protected void btn_Click(object sender, EventArgs e) {
             Button clickedButton = (Button)sender;

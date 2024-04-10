@@ -1,70 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Web;
-using System.Web.Services;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.Script.Serialization;
-using System.Text.RegularExpressions;
 using System.Net.Http;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Drawing;
+using System.Web.UI;
+using System.Web.UI.WebControls;
 namespace TechPractice {
     public partial class CreateEventView : System.Web.UI.Page {
-
-
-        protected void Page_Init(object sender, EventArgs e) {
-            // Call the method to create location buttons
-            CreateLocationButtons();
-        }
-
-        public class CountryData {
-            public string ShortForm { get; set; }
-            public string Country { get; set; }
-        }
+        string minDateTime;
         protected void Page_Load(object sender, EventArgs e) {
             if (!IsPostBack) {
-                Session["SelectedLocations"] = new List<string>();
+                Session["SelectedLocation"] = "";
                 FetchAndPopulateCountries();
+                minDateTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm");
+                string script = string.Format("document.getElementById('{0}').min = '{1}';", TextBoxDateTime.ClientID, minDateTime);
+                ScriptManager.RegisterStartupScript(this, GetType(), "SetMinDateTime", script, true);
+            }
+            else {
+                if (Session["SelectedLocation"] as string != null) {
+                    string location = Session["SelectedLocation"] as string;
+                    if (TimeZoneDictionary.TimeZones.ContainsKey(location) && TimeZoneDictionary.TimeZones[location].Item2 == "UTCVariety") {
+                        AddTimeZoneDropdown(location);
+                    }
+                }
             }
         }
-        protected void txtTTL_TextChanged(object sender, EventArgs e) {
-            string input = txtTTL.Text.Trim();
-            string pattern = @"^\d+$";
-            if (!Regex.IsMatch(input, pattern)) {
-                txtTTL.Text = string.Empty;
-                txtTTL.BorderColor = Color.Red;
-            }else
-                txtTTL.BorderColor= Color.White;
-        }
+
         private void FetchAndPopulateCountries() {
             try {
-                Console.WriteLine("Fetching countries synchronously...");
                 string content = FetchCountries();
                 if (!string.IsNullOrEmpty(content)) {
-                    // Use regex to find the country data
-                    Regex regex = new Regex("\"(\\w+)\":\\s*\\{\"country\":\\s*\"(\\w+)\"");
+                    Regex regex = new Regex("\"(\\w+)\":\\s*\\{\"country\":\\s*\"([\\w\\s]+)\"");
                     MatchCollection matches = regex.Matches(content);
-
-                    // Extract the country data and populate the dropdown list
                     foreach (Match match in matches) {
                         string shortForm = match.Groups[1].Value;
                         string country = match.Groups[2].Value;
-                        Console.WriteLine($"Short Form: {shortForm}, Country: {country}");
                         ddlLocation.Items.Add(new ListItem(country, shortForm));
                     }
                 }
                 else {
-                    Console.WriteLine("Failed to fetch countries data.");
                 }
             }
             catch (Exception ex) {
-                // Handle any errors
-                Console.WriteLine($"An error occurred: {ex.Message}");
+                Debug.WriteLine($"An error occurred: {ex.Message}");
             }
         }
 
@@ -77,90 +57,124 @@ namespace TechPractice {
                     return response.Content.ReadAsStringAsync().Result;
                 }
                 else {
-                    Console.WriteLine($"Failed to fetch data. Status code: {response.StatusCode}");
+                    Debug.WriteLine($"Failed to fetch data. Status code: {response.StatusCode}");
                     return null;
                 }
             }
         }
 
-        protected void ddlLocation_SelectedIndexChanged(object sender, EventArgs e) {
-            List<string> selectedLocations = Session["SelectedLocations"] as List<string>;
-            if (selectedLocations == null) {
-                selectedLocations = new List<string>();
-            }
-
-            foreach (ListItem item in ddlLocation.Items) {
-                if (item.Selected && !selectedLocations.Contains(item.Text)) {
-                    selectedLocations.Add(item.Text);
+        protected void btnSubmit_Click(object sender, EventArgs e) {
+            string location = ddlLocation.SelectedItem.Value;
+            string clarificationTimeZone = "";
+            if (TimeZoneDictionary.TimeZones.ContainsKey(location) && TimeZoneDictionary.TimeZones[location].Item2 == "UTCVariety") {
+                DropDownList ddlTimezone = (DropDownList)pnlSelectedLocations.FindControl("ddlTimezone");
+                if (ddlTimezone != null && !string.IsNullOrEmpty(ddlTimezone.SelectedValue)) {
+                    clarificationTimeZone = ddlTimezone.SelectedValue;
                 }
             }
-            Session["SelectedLocations"] = selectedLocations;
-            UpdateSelectedLocationsPanel(selectedLocations);
-        }
-        protected void btnSubmit_Click(object sender, EventArgs e) {
-            List<string> selectedLocations = Session["SelectedLocations"] as List<string>;
+
             string filePath = Server.MapPath("~/EventData.csv");
+            string dateTime = TextBoxDateTime.Text;
             Guid eventId = Guid.NewGuid();
             string publicLink = $"https://localhost:44323/DetailedView.aspx/?id={eventId}";
             string ownerId = "user";
+            string line = $"{eventId};{txtName.Text};{txtTTL.Text};{location};{publicLink};{ownerId};{dateTime};{clarificationTimeZone}";
             using (StreamWriter writer = new StreamWriter(filePath, true)) {
-                writer.WriteLine($"{eventId};{txtName.Text};{txtTTL.Text};{string.Join(",", selectedLocations)};{publicLink};{ownerId}");
-            }
-            selectedLocations.Clear();
-        }
-
-        protected void LocationButton_Click(object sender, EventArgs e) {
-            Button btn = (Button)sender;
-            string location = btn.Text;
-
-            List<string> selectedLocations = Session["SelectedLocations"] as List<string>;
-            if (selectedLocations != null) {
-                selectedLocations.Remove(location);
-
-                Session["SelectedLocations"] = selectedLocations;
-                UpdateSelectedLocationsPanel(selectedLocations);
+                writer.WriteLine(line);
             }
         }
 
 
-        private void CreateLocationButtons() {
-            // Clear the panel before creating buttons
-            pnlSelectedLocations.Controls.Clear();
-
-            // Get the selected locations from session
-            List<string> selectedLocations = (List<string>)Session["SelectedLocations"];
-
-            // Initialize the list if it's null
-            if (selectedLocations == null) {
-                selectedLocations = new List<string>();
-                Session["SelectedLocations"] = selectedLocations;
+        protected void txtTTL_TextChanged(object sender, EventArgs e) {
+            string input = txtTTL.Text.Trim();
+            string pattern = @"^\d+$";
+            if (!Regex.IsMatch(input, pattern)) {
+                txtTTL.Text = string.Empty;
+                txtTTL.BorderColor = Color.Red;
             }
+            else
+                txtTTL.BorderColor = Color.White;
+        }
 
-            // Add buttons for each selected location
-            foreach (string location in selectedLocations) {
-                Button button = new Button();
-                button.Text = location;
-                button.CssClass = "location-button";
-                button.Click += LocationButton_Click; // Attach event handler
-                pnlSelectedLocations.Controls.Add(button);
+        protected void ddlLocation_SelectedIndexChanged(object sender, EventArgs e) {
+            string location = ddlLocation.SelectedItem.Value;
+            Session["SelectedLocation"] = location;
+            if (TimeZoneDictionary.TimeZones.ContainsKey(location) && TimeZoneDictionary.TimeZones[location].Item2 == "UTCVariety") {
+                AddTimeZoneDropdown(location);
+            }
+            else {
+                RemoveTimeZoneDropdown();
             }
         }
 
-        private void UpdateSelectedLocationsPanel(List<string> selectedLocations) {
-            pnlSelectedLocations.Controls.Clear();
-            foreach (string location in selectedLocations) {
-                Button btn = new Button();
-                btn.Text = location;
-                btn.Click += new EventHandler(LocationButton_Click);
-                pnlSelectedLocations.Controls.Add(btn);
+        private void AddTimeZoneDropdown(string location) {
+            DropDownList ddlTimezone = new DropDownList();
+            ddlTimezone.ID = "ddlTimezone";
+            if (TimeZoneDictionary.TimeZones.ContainsKey(location)) {
+                List<string> utcOffsets = new List<string>();
+                switch (location) {
+                    case "RU": // Russia
+                        utcOffsets.AddRange(new[] { "+02:00", "+03:00", "+04:00", "+05:00", "+06:00", "+07:00", "+08:00", "+09:00", "+10:00", "+11:00", "+12:00" });
+                        break;
+                    case "US": // USA
+                        utcOffsets.AddRange(new[] { "-10:00", "-09:00", "-08:00", "-07:00", "-06:00", "-05:00", "-04:00" });
+                        break;
+                    case "MN": // Mongolia
+                        utcOffsets.AddRange(new[] { "+07:00", "+08:00" });
+                        break;
+                    case "MX": // Mexico
+                        utcOffsets.AddRange(new[] { "-05:00", "-06:00", "-07:00"});
+                        break;
+                    case "KZ": // Kazakhstan
+                        utcOffsets.AddRange(new[] { "+05:00", "+06:00" });
+                        break;
+                    case "ID": // Indonesia
+                        utcOffsets.AddRange(new[] { "+07:00", "+08:00", "+09:00" });
+                        break;
+                    case "BR": // Brazil
+                        utcOffsets.AddRange(new[] { "-05:00", "-04:00", "-03:00", "-02:00" });
+                        break;
+                    case "AU": // Australia
+                        utcOffsets.AddRange(new[] { "+10:30", "+10:00", "+09:30", "+08:45", "+08:00" });
+                        break;
+                    default:
+                        for (int hour = -12; hour <= 12; hour++) {
+                            for (int minute = 0; minute <= 30; minute += 30) {
+                                string offset = $"{(hour >= 0 ? "+" : "-")}{Math.Abs(hour).ToString("00")}:{minute.ToString("00")}";
+                                utcOffsets.Add(offset);
+                            }
+                        }
+                        break;
+                }
+                RemoveTimeZoneDropdown();
+                foreach (var offset in utcOffsets) {
+                        ddlTimezone.Items.Add(new ListItem($"UTC{offset}", $"UTC{offset}"));
+                }
+                pnlSelectedLocations.Controls.Add(ddlTimezone);
+            }
+            else {
+                RemoveTimeZoneDropdown();
+            }
+        }
 
-                // Add a line break after each button except for the last one
-                if (location != selectedLocations.Last()) {
-                    pnlSelectedLocations.Controls.Add(new LiteralControl("<br/>"));
+        private void RemoveTimeZoneDropdown() {
+            DropDownList ddlTimezone = (DropDownList)pnlSelectedLocations.FindControl("ddlTimezone");
+            if (ddlTimezone != null) {
+                pnlSelectedLocations.Controls.Remove(ddlTimezone);
+            }
+        }
+
+        protected void TextBoxDateTime_TextChanged(object sender, EventArgs e) {
+            DateTime minDateTime = DateTime.Now;
+            DateTime enteredDateTime;
+            if (DateTime.TryParse(TextBoxDateTime.Text, out enteredDateTime)) {
+                if (enteredDateTime < minDateTime) {
+                    DateTime now = DateTime.Now;
+                    DateTime nextHour = now.AddHours(1);
+                    TextBoxDateTime.Text = nextHour.ToString("yyyy-MM-ddTHH:mm");
                 }
             }
         }
-
     }
 }
 
