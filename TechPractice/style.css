@@ -35,7 +35,6 @@
     --dl-space-space-oneandhalfunits: 24px;
 }
 
-/* General styles */
 html {
     font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     font-size: 16px;
@@ -56,7 +55,6 @@ body {
     border-style: solid;
 }
 
-/* Button styles */
 .button,
 .input,
 .textarea {
@@ -70,10 +68,8 @@ body {
     .button:hover,
     .input:hover,
     .textarea:hover {
-        /* Add hover styles if needed */
     }
 
-/* List styles */
 .list {
     width: 100%;
     margin: 1em 0;
@@ -85,7 +81,6 @@ body {
     display: list-item;
 }
 
-/* Popup styles */
 .Background {
     background-color: rgba(0, 0, 0, 0.5);
 }
@@ -99,7 +94,6 @@ body {
     height: 350px;
 }
 
-/* Dropdown styles */
 .navigation-links-dropdown,
 .navigation-links-dropdown1,
 .navigation-links-dropdown2 {
@@ -135,7 +129,6 @@ body {
     transition: 0.3s;
 }
 
-/* Container styles */
 .home-container,
 .container-container,
 .home-container1,
@@ -171,7 +164,6 @@ body {
     align-self: center;
 }
 
-/* Header and Footer styles */
 .home-header,
 .home-footer {
     width: 100%;
@@ -182,7 +174,6 @@ body {
     justify-content: space-between;
 }
 
-/* Dropdown list styles */
 .navigation-links-dropdown-list,
 .navigation-links-dropdown-list1,
 .navigation-links-dropdown-list2 {
@@ -198,7 +189,6 @@ body {
     background-color: var(--dl-color-gray-white);
 }
 
-/* Dropdown item styles */
 .navigation-links-p-day,
 .navigation-links-m-day,
 .navigation-links-text5 {
@@ -210,12 +200,10 @@ body {
     font-weight: 500;
 }
 
-/* Menu styles */
 .home-burger-menu {
     display: none;
 }
 
-/* Responsive styles */
 @media screen and (max-width: 768px) {
     .home-burger-menu {
         display: block;

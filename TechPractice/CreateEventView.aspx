@@ -1,6 +1,12 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CreateEventView.aspx.cs" Inherits="TechPractice.CreateEventView" %>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http:
+    
+    
+    
+    
+    
+    www.w3.org/1999/xhtml">
 <head runat="server">
     <title>Create Event</title>
         <link rel="stylesheet" href="./style.css" />
